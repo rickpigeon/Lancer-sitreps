@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#e9d6ff"/>
+      <stop offset="1" stop-color="#7d3cc8"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="100" cy="150" rx="62" ry="22" fill="#000" opacity=".35"/>
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#a259e0" stroke-width="8" stroke-dasharray="18 10" opacity=".9"/>
+  <path d="M100 32 L148 78 L130 146 L70 146 L52 78 Z" fill="url(#g)" stroke="#2a0f4a" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M100 32 L100 146 M52 78 L148 78" stroke="#ffffff" stroke-width="4" opacity=".55"/>
+  <rect x="58" y="160" width="84" height="26" rx="5" fill="#2a0f4a"/>
+  <text x="100" y="179" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#fff" text-anchor="middle">OBJETIVO</text>
+</svg>
