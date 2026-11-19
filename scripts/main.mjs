@@ -12,6 +12,9 @@ import { MiniApp, onMoveToken, onRenderTokenHUD } from "./minis.mjs";
 import { initInspect, isInspecting, setInspect } from "./inspect.mjs";
 import { generateMap } from "./generator.mjs";
 import { createSitrepScene, getMap, repaintScene } from "./scene-builder.mjs";
+import { applyFx, stopFx } from "./effects.mjs";
+import { refreshHud, renderHud } from "./initiative-hud.mjs";
+import { closeSitrepScene, onPreUpdateScene } from "./closing.mjs";
 
 Hooks.once("init", () => {
   const S = (key, data) => game.settings.register(MODULE_ID, key, data);
@@ -39,12 +42,23 @@ Hooks.once("init", () => {
     name: "Abrir o painel do sitrep", hint: "Abre o painel ao entrar numa cena de sitrep.",
     scope: "client", config: true, type: Boolean, default: true
   });
+  S("effects", {
+    name: "Efeitos de ambiente na tela", hint: "Mostra neve, tempestades, poeira, calor, radiação etc. conforme o ambiente da cena de sitrep (o mestre escolhe no painel).",
+    scope: "client", config: true, type: Boolean, default: true, onChange: () => applyFx()
+  });
+  S("initiativeHud", {
+    name: "HUD de iniciativa no topo", hint: "Barra de ativações do combate (sincronizada com o sistema Lancer) no topo da tela.",
+    scope: "client", config: true, type: String, default: "sitrep",
+    choices: { sitrep: "Só em cenas de sitrep", always: "Em qualquer cena com combate", never: "Nunca" },
+    onChange: () => renderHud()
+  });
   S("lastOptions", { scope: "world", config: false, type: Object, default: {} });
   watchUncaught();
 });
 
 Hooks.once("ready", () => {
   initInspect();
+  Hooks.on("canvasTearDown", () => stopFx());
   const mod = game.modules.get(MODULE_ID);
   if ( mod ) {
     mod.api = {
@@ -52,6 +66,8 @@ Hooks.once("ready", () => {
       editor: scene => EditorApp.open(scene),
       painel: scene => PanelApp.open(scene),
       mini: () => MiniApp.open(),
+      encerrar: scene => closeSitrepScene(scene ?? canvas.scene),
+      efeitos: applyFx, hud: renderHud,
       generateMap, createSitrepScene, repaintScene, getMap
     };
   }
@@ -83,12 +99,21 @@ for ( const hook of ["createToken", "updateToken", "deleteToken", "createDrawing
 }
 Hooks.on("updateScene", (scene, changed) => {
   if ( foundry.utils.hasProperty(changed, `flags.${MODULE_ID}`) ) refresh();
+  if ( scene.id === canvas?.scene?.id && foundry.utils.hasProperty(changed, `flags.${MODULE_ID}.fx`) ) applyFx(scene);
 });
+Hooks.on("preUpdateScene", guard(onPreUpdateScene, "cena anterior"));
+
+/* initiative HUD in sync with the combat (Lancer activations) */
+for ( const hook of ["createCombat", "updateCombat", "deleteCombat", "combatStart", "combatRound", "combatTurn", "createCombatant", "updateCombatant", "deleteCombatant", "updateToken"] ) {
+  Hooks.on(hook, () => refreshHud());
+}
 
 Hooks.on("canvasReady", guard(cv => {
   const isSitrep = !!getMap(cv.scene);
   ui.controls?.render?.();
   if ( isSitrep && game.settings.get(MODULE_ID, "autoPanel") ) PanelApp.open(cv.scene);
+  applyFx(cv.scene);
+  renderHud();
   if ( !isSitrep ) {
     setInspect(false);
     foundry.applications.instances.get(`${MODULE_ID}-panel`)?.close();

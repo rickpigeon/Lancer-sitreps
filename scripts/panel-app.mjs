@@ -11,6 +11,10 @@ import { closeRound, controlLabel, evaluate, fmt, getState, newState, saveState,
 import { getSecrets, setSecrets } from "./secrets.mjs";
 import { esc, sitrepRulesHTML } from "./briefing.mjs";
 import { ENVIRONMENTS } from "./data/worlds.mjs";
+import { FX_ORDER, FX_PRESETS } from "./data/effects.mjs";
+import { getFx } from "./effects.mjs";
+import { closeSitrepScene } from "./closing.mjs";
+import { renderHud } from "./initiative-hud.mjs";
 
 const APP_ID = `${MODULE_ID}-panel`;
 
@@ -43,7 +47,10 @@ export class PanelApp extends HtmlApp {
       trueCz: PanelApp.#onTrueCz,
       checkCz: PanelApp.#onCheckCz,
       verdict: PanelApp.#onVerdict,
-      announce: PanelApp.#onAnnounce
+      announce: PanelApp.#onAnnounce,
+      fxToggle: PanelApp.#onFxToggle,
+      hudToggle: PanelApp.#onHudToggle,
+      closeScene: PanelApp.#onCloseScene
     })
   };
 
@@ -140,6 +147,23 @@ export class PanelApp extends HtmlApp {
       <p class="lsr-hint">${game.settings.get(MODULE_ID, "autoScore") ? "Com combate ativo nesta cena, a rodada fecha sozinha quando o rastreador passa para a seguinte." : "Fechamento automático desligado nas configurações."} Lados: disposição Amistosa = PJs; Hostil/Secreta = inimigos; tokens escondidos, derrotados e deployables não contam.</p>`);
     }
 
+    /* screen effects, initiative HUD, closing */
+    const fx = getFx(scene) ?? { on: false, preset: "fog", intensity: 1 };
+    const hudMode = game.settings.get(MODULE_ID, "initiativeHud");
+    const myFx = game.settings.get(MODULE_ID, "effects");
+    const fxLabel = k => (/^\d+$/.test(k) ? `${k}. ${FX_PRESETS[k].name}` : FX_PRESETS[k].name);
+    const fxCtl = gm
+      ? `<div class="lsr-fxctl"><select data-fx="preset">${FX_ORDER.map(k => opt(k, fxLabel(k), String(fx.preset) === k)).join("")}</select>
+        <label class="lsr-fxint">Intensidade <input type="range" data-fx="intensity" min="0.2" max="2" step="0.1" value="${fx.intensity ?? 1}"></label>
+        <button type="button" data-action="fxToggle" class="${fx.on ? "active" : ""}" data-tooltip="Liga ou desliga o efeito de ambiente para todos"><i class="fa-solid fa-cloud-bolt"></i> ${fx.on ? "Efeito ligado" : "Efeito desligado"}</button></div>`
+      : `<p>Efeito: <b>${fx.on ? esc(FX_PRESETS[fx.preset]?.name ?? "") : "nenhum"}</b></p>`;
+    parts.push(`<h3>Tela</h3>${fxCtl}
+      <div class="lsr-row">
+        <button type="button" data-action="fxToggle" data-local="1" class="${myFx ? "active" : ""}" data-tooltip="Só para você: mostrar os efeitos de ambiente"><i class="fa-solid fa-eye"></i> Efeitos na minha tela</button>
+        <button type="button" data-action="hudToggle" class="${hudMode !== "never" ? "active" : ""}" data-tooltip="Só para você: barra de iniciativa no topo"><i class="fa-solid fa-bars-staggered"></i> HUD de iniciativa</button>
+      </div>
+      ${gm ? `<div class="lsr-row lsr-foot"><button type="button" class="lsr-danger" data-action="closeScene" data-tooltip="Encerra o sitrep e leva todos de volta para a cena anterior"><i class="fa-solid fa-right-from-bracket"></i> Encerrar cena e voltar</button></div>` : ""}`);
+
     const env = map.world?.env ? ENVIRONMENTS[map.world.env - 1] : null;
     if ( env ) parts.push(`<details><summary>Ambiente: ${esc(env.name)}</summary><p>${esc(env.rule)}</p></details>`);
     parts.push(`<details ${round ? "" : "open"}><summary>Regras — ${esc(s.pt)} (${esc(s.name)})</summary>${sitrepRulesHTML(map.sitrep)}</details>`);
@@ -148,6 +172,14 @@ export class PanelApp extends HtmlApp {
 
   _onRender(context, options) {
     super._onRender(context, options);
+    this.element.querySelectorAll("[data-fx]").forEach(input => input.addEventListener("change", () => {
+      const fx = { on: false, preset: "fog", intensity: 1, ...(getFx(this.scene) ?? {}) };
+      if ( input.dataset.fx === "preset" ) {
+        fx.preset = input.value;
+        fx.on = true;
+      } else fx.intensity = Number(input.value);
+      this.scene.update({ [`flags.${MODULE_ID}.fx`]: fx });
+    }));
     this.element.querySelector("[data-obj=size]")?.addEventListener("change", ev => {
       const size = Number(ev.target.value) || 1;
       this.#mutate(state => {
@@ -278,6 +310,27 @@ export class PanelApp extends HtmlApp {
     const ev = evaluate(this.scene, map, state, getSecrets(this.scene.id));
     const v = verdictOf(map, state, ev);
     if ( v ) await postChat(`<div class="lsr-chat"><h3>${esc(SITREPS[map.sitrep].pt)}: resultado</h3><p class="lsr-verdict lsr-${v.side}">${esc(v.text)}</p></div>`);
+  }
+
+  static async #onFxToggle(event, target) {
+    if ( target.dataset.local ) {
+      await game.settings.set(MODULE_ID, "effects", !game.settings.get(MODULE_ID, "effects"));
+      return this.render();
+    }
+    const fx = { on: false, preset: "fog", intensity: 1, ...(getFx(this.scene) ?? {}) };
+    fx.on = !fx.on;
+    await this.scene.update({ [`flags.${MODULE_ID}.fx`]: fx });
+  }
+
+  static async #onHudToggle() {
+    const mode = game.settings.get(MODULE_ID, "initiativeHud");
+    await game.settings.set(MODULE_ID, "initiativeHud", mode === "never" ? "sitrep" : "never");
+    renderHud();
+    this.render();
+  }
+
+  static async #onCloseScene() {
+    await closeSitrepScene(this.scene);
   }
 
   static async #onAnnounce() {

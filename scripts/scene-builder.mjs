@@ -14,6 +14,12 @@ import { newState } from "./scoring.mjs";
 export const MARGIN = 2;           // empty hexes around the map (even, so row/column parity is kept)
 const MAX_SIDE = 8192;
 
+/** Screen effect that matches the rolled environment (on only when there is one). */
+export function defaultFx(map) {
+  const env = Number(map.world?.env) || 0;
+  return { on: env > 0, preset: env > 0 ? String(env) : "fog", intensity: 1 };
+}
+
 export function gridTypeOf(map) {
   const T = CONST.GRID_TYPES;
   if ( map.columns ) return map.even ? T.HEXEVENQ : T.HEXODDQ;
@@ -107,7 +113,7 @@ export async function createSitrepScene(map, opts = {}) {
     grid: { type: gridTypeOf(map), size, distance: 1, units: "", alpha: 0.12, color: "#000000", thickness: 1 },
     tokenVision: false,
     fog: { exploration: false },
-    flags: { [MODULE_ID]: { [FLAG_MAP]: map, [FLAG_STATE]: newState(map) } }
+    flags: { [MODULE_ID]: { [FLAG_MAP]: map, [FLAG_STATE]: newState(map), fx: defaultFx(map) } }
   });
 
   const src = await paintBackground(scene, map);

@@ -1,0 +1,57 @@
+/**
+ * Screen effects for the 20 environments (Lancer core book p. 278-279) plus a few extra looks.
+ * particles: { kind, n (per 1000×1000 px), color, speed (px/s), angle (deg, 90 = down), size, wobble, alpha }
+ * kind: flake | streak | dot | ember | blob | spark
+ */
+export const FX_PRESETS = {
+  1: { name: "Flora ou Fauna Perigosa", tint: "rgba(80,140,40,0.08)", vignette: "rgba(40,90,20,0.35)",
+    particles: [{ kind: "dot", n: 45, color: "#d8ff7a", speed: 18, angle: -70, size: 2.5, wobble: 25, alpha: 0.75 }, { kind: "blob", n: 6, color: "#6ab04a", speed: 8, angle: 10, size: 120, alpha: 0.08 }] },
+  2: { name: "Frio Extremo", tint: "rgba(170,210,255,0.10)", vignette: "rgba(200,235,255,0.55)",
+    particles: [{ kind: "flake", n: 230, color: "#ffffff", speed: 75, angle: 100, size: 4.5, wobble: 30, alpha: 0.95 }, { kind: "streak", n: 20, color: "#e6f4ff", speed: 380, angle: 168, size: 60, alpha: 0.25 }] },
+  3: { name: "Calor Extremo", tint: "rgba(255,140,40,0.10)", vignette: "rgba(255,90,20,0.35)", haze: true,
+    particles: [{ kind: "dot", n: 40, color: "#ffd090", speed: 30, angle: -90, size: 2, wobble: 40, alpha: 0.4 }] },
+  4: { name: "Atmosfera Rala", tint: "rgba(220,225,235,0.08)", vignette: "rgba(180,190,210,0.3)",
+    particles: [{ kind: "streak", n: 26, color: "#ffffff", speed: 520, angle: 176, size: 90, alpha: 0.18 }] },
+  5: { name: "Sol Extremo", tint: "rgba(255,240,170,0.12)", vignette: "rgba(255,230,140,0.25)", glare: "#fff6c8",
+    particles: [{ kind: "dot", n: 20, color: "#fff8d8", speed: 10, angle: -60, size: 2, wobble: 20, alpha: 0.6 }] },
+  6: { name: "Atmosfera Corrosiva", tint: "rgba(170,220,40,0.10)", vignette: "rgba(120,170,20,0.4)",
+    particles: [{ kind: "streak", n: 120, color: "#d8ff5a", speed: 520, angle: 102, size: 18, alpha: 0.45 }, { kind: "blob", n: 5, color: "#b8e040", speed: 10, angle: 0, size: 160, alpha: 0.07 }] },
+  7: { name: "Tempestade de Partículas", tint: "rgba(200,150,80,0.20)", vignette: "rgba(150,100,40,0.5)",
+    particles: [{ kind: "streak", n: 220, color: "#e8c890", speed: 900, angle: 172, size: 26, alpha: 0.55 }, { kind: "blob", n: 10, color: "#c89a5a", speed: 260, angle: 175, size: 220, alpha: 0.12 }] },
+  8: { name: "Tempestade Elétrica", tint: "rgba(40,50,90,0.18)", vignette: "rgba(10,10,40,0.55)", flash: { every: 7, color: "rgba(220,230,255,0.75)" },
+    particles: [{ kind: "streak", n: 200, color: "#b8c8ff", speed: 1100, angle: 100, size: 24, alpha: 0.5 }] },
+  9: { name: "Tempestade Disruptiva", tint: "rgba(120,60,180,0.10)", vignette: "rgba(80,20,140,0.4)", glitch: true,
+    particles: [{ kind: "spark", n: 30, color: "#d0a0ff", speed: 0, angle: 0, size: 18, alpha: 0.8 }] },
+  10: { name: "Tempestade Perigosa", tint: "rgba(200,60,20,0.12)", vignette: "rgba(120,20,0,0.5)",
+    particles: [{ kind: "ember", n: 18, color: "#ffb040", speed: 520, angle: 125, size: 5, alpha: 0.95 }, { kind: "streak", n: 90, color: "#ffd0a0", speed: 760, angle: 115, size: 22, alpha: 0.35 }] },
+  11: { name: "Mundo Oceânico", tint: "rgba(30,110,190,0.12)", vignette: "rgba(10,60,130,0.45)",
+    particles: [{ kind: "streak", n: 140, color: "#cfe8ff", speed: 900, angle: 98, size: 20, alpha: 0.4 }, { kind: "blob", n: 8, color: "#bfe0ff", speed: 14, angle: 0, size: 220, alpha: 0.06 }] },
+  12: { name: "Terremotos", tint: "rgba(140,110,80,0.06)", vignette: "rgba(80,60,40,0.4)", shake: { every: 9 },
+    particles: [{ kind: "dot", n: 50, color: "#c8a878", speed: 60, angle: 90, size: 2.5, wobble: 10, alpha: 0.5 }] },
+  13: { name: "Mundo Derretido", tint: "rgba(255,80,20,0.10)", vignette: "rgba(200,30,0,0.55)", haze: true,
+    particles: [{ kind: "ember", n: 70, color: "#ff8a2a", speed: 60, angle: -90, size: 3, wobble: 35, alpha: 0.9 }] },
+  14: { name: "Mundo Primordial", tint: "rgba(110,140,60,0.10)", vignette: "rgba(60,80,30,0.45)",
+    particles: [{ kind: "blob", n: 12, color: "#c8d8a0", speed: 12, angle: 10, size: 260, alpha: 0.1 }, { kind: "dot", n: 30, color: "#e8ffb0", speed: 25, angle: -90, size: 3, wobble: 15, alpha: 0.5 }] },
+  15: { name: "Gravidade Baixa", tint: "rgba(160,170,220,0.06)", vignette: "rgba(80,90,150,0.3)",
+    particles: [{ kind: "dot", n: 70, color: "#e8ecff", speed: 12, angle: -90, size: 2.5, wobble: 30, alpha: 0.6 }] },
+  16: { name: "Gravidade Alta", tint: "rgba(30,20,40,0.12)", vignette: "rgba(0,0,0,0.6)",
+    particles: [{ kind: "streak", n: 80, color: "#9a90a8", speed: 1400, angle: 90, size: 14, alpha: 0.35 }] },
+  17: { name: "Mundo-Tumba (radiação)", tint: "rgba(120,255,60,0.07)", vignette: "rgba(60,160,20,0.45)", flicker: "rgba(150,255,80,0.08)",
+    particles: [{ kind: "dot", n: 60, color: "#b8ff6a", speed: 15, angle: -80, size: 2.5, wobble: 25, alpha: 0.8 }] },
+  18: { name: "Mundo de Agulhas", tint: "rgba(200,210,255,0.06)", vignette: "rgba(120,130,200,0.35)",
+    particles: [{ kind: "blob", n: 14, color: "#ffffff", speed: 20, angle: 0, size: 280, alpha: 0.09 }] },
+  19: { name: "Mundo que Afunda", tint: "rgba(190,150,90,0.10)", vignette: "rgba(120,80,30,0.4)",
+    particles: [{ kind: "streak", n: 90, color: "#e2c48a", speed: 340, angle: 178, size: 30, alpha: 0.35 }] },
+  20: { name: "Mundo Sagrado", tint: "rgba(255,240,220,0.05)", vignette: "rgba(255,220,180,0.2)",
+    particles: [{ kind: "dot", n: 40, color: "#fff2c8", speed: 14, angle: -70, size: 3, wobble: 30, alpha: 0.7 }, { kind: "flake", n: 14, color: "#ffc0d8", speed: 30, angle: 70, size: 4, wobble: 40, alpha: 0.7 }] },
+  rain: { name: "Chuva", tint: "rgba(40,60,90,0.10)", vignette: "rgba(10,20,40,0.4)",
+    particles: [{ kind: "streak", n: 180, color: "#cfe0ff", speed: 1000, angle: 100, size: 22, alpha: 0.45 }] },
+  fog: { name: "Neblina", tint: "rgba(220,225,230,0.10)", vignette: "rgba(200,205,210,0.4)",
+    particles: [{ kind: "blob", n: 18, color: "#ffffff", speed: 16, angle: 0, size: 300, alpha: 0.12 }] },
+  ash: { name: "Cinzas", tint: "rgba(90,80,75,0.10)", vignette: "rgba(30,20,20,0.5)",
+    particles: [{ kind: "flake", n: 120, color: "#b8b0a8", speed: 35, angle: 110, size: 2.5, wobble: 25, alpha: 0.7 }] },
+  space: { name: "Vácuo / estrelas", tint: "rgba(10,10,30,0.08)", vignette: "rgba(0,0,10,0.55)",
+    particles: [{ kind: "spark", n: 25, color: "#ffffff", speed: 0, angle: 0, size: 6, alpha: 0.8 }] }
+};
+
+export const FX_ORDER = [...Array.from({ length: 20 }, (_, i) => String(i + 1)), "rain", "fog", "ash", "space"];
