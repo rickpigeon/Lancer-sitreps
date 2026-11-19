@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 — 2026-11-18
+
+- **Altura visual dos hexágonos**:
+  - no gerador, um controle deslizante antes de criar a cena muda quanto cada nível "sobe" no desenho; a prévia e o diorama acompanham;
+  - depois de criada a cena, o mesmo ajuste fica no editor de zonas e terreno, com os botões "Todo o terreno +1/−1". Depois é só clicar em "Repintar fundo".
+- **Visão noturna** (efeito no painel, depois dos 20 ambientes):
+  - o próprio mapa fica verde-fósforo e mais contrastado;
+  - entram granulado, linhas de varredura, borda de óculos e o letreiro "NV // GEN-III".
+  - Com intensidade baixa (< 0,6), o verde fica mais suave.
+
 ## 1.1.0 — 2026-11-18
 
 - **Efeitos de ambiente na tela** para os 20 ambientes do livro (p. 278–279) e mais 4 extras (chuva, neblina, cinzas, vácuo):

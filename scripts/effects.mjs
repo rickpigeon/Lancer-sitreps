@@ -28,7 +28,7 @@ function build() {
   if ( root?.isConnected ) return;
   root = document.createElement("div");
   root.className = "lsr-fx";
-  root.innerHTML = `<div class="lsr-fx-tint"></div><div class="lsr-fx-haze"></div><canvas></canvas><div class="lsr-fx-glare"></div><div class="lsr-fx-vignette"></div><div class="lsr-fx-flash"></div>`;
+  root.innerHTML = `<div class="lsr-fx-tint"></div><div class="lsr-fx-haze"></div><canvas></canvas><div class="lsr-fx-glare"></div><div class="lsr-fx-vignette"></div><div class="lsr-fx-scan"></div><div class="lsr-fx-goggles"><span>NV // GEN-III</span><span class="lsr-fx-rec">● AMP</span></div><div class="lsr-fx-flash"></div>`;
   const board = document.getElementById("board");
   if ( board?.parentElement ) board.after(root);
   else document.body.prepend(root);
@@ -151,6 +151,13 @@ function frame(now) {
     drawPart(p, t);
   }
   ctx.globalAlpha = 1;
+  if ( preset.grain ) {
+    const n = Math.round((W * H / 9000) * preset.grain * intensity);
+    for ( let i = 0; i < n; i++ ) {
+      ctx.fillStyle = Math.random() < 0.5 ? "rgba(200,255,210,0.22)" : "rgba(0,20,0,0.25)";
+      ctx.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5);
+    }
+  }
   if ( preset.glitch && Math.random() < 0.06 * intensity ) {
     for ( let i = 0; i < 4; i++ ) {
       ctx.fillStyle = `rgba(${Math.random() < 0.5 ? "200,120,255" : "120,255,240"},${0.08 + (Math.random() * 0.12)})`;
@@ -188,12 +195,21 @@ function shake() {
 }
 
 export function stopFx() {
+  setBoardFilter("");
   preset = null;
   current = "";
   parts = [];
   cancelAnimationFrame(raf);
   raf = 0;
   if ( root ) root.hidden = true;
+}
+
+/** Change the look of the map itself (night vision turns the board green and grainy). */
+function setBoardFilter(filter) {
+  const board = document.getElementById("board");
+  if ( !board ) return;
+  board.style.filter = filter;
+  board.classList.toggle("lsr-nv-board", !!filter);
 }
 
 /** Apply the effect of a scene (or stop). */
@@ -220,6 +236,9 @@ export function applyFx(scene = canvas?.scene) {
   css(".lsr-fx-vignette", "opacity", String(k));
   css(".lsr-fx-glare", "background", p.glare ? `radial-gradient(circle at 88% 6%, ${p.glare} 0%, rgba(255,255,255,0) 45%)` : "none");
   root.querySelector(".lsr-fx-haze")?.classList.toggle("on", !!p.haze && !reducedMotion());
+  root.querySelector(".lsr-fx-scan")?.classList.toggle("on", !!p.scan);
+  root.querySelector(".lsr-fx-goggles")?.classList.toggle("on", !!p.goggles);
+  setBoardFilter(p.boardFilter ? (intensity < 0.6 ? p.boardFilter.replace("grayscale(1)", "grayscale(0.6)") : p.boardFilter) : "");
   nextFlash = 0;
   nextShake = 0;
   spawnAll();

@@ -176,3 +176,14 @@
 .lsr-ihud.collapsed { min-width: 260px; }
 .lsr-close select { width: 100%; margin: 4px 0 8px; }
 .lsr-close .lsr-check { display: flex; gap: 6px; align-items: center; }
+
+/* ---------- 1.2: night vision ---------- */
+#board.lsr-nv-board { transition: filter 0.6s ease; }
+.lsr-fx-scan, .lsr-fx-goggles { opacity: 0; transition: opacity 0.4s; }
+.lsr-fx-scan.on { opacity: 1; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, rgba(0,0,0,0) 1px 3px); animation: lsr-scan 6s linear infinite; }
+@keyframes lsr-scan { from { background-position: 0 0; } to { background-position: 0 300px; } }
+.lsr-fx-goggles.on { opacity: 1; background: radial-gradient(ellipse 62% 70% at 50% 52%, rgba(0,0,0,0) 72%, rgba(0,12,0,0.75) 88%, rgba(0,0,0,0.95) 100%); }
+.lsr-fx-goggles span { position: absolute; bottom: 18px; left: 28px; font: 600 12px Consolas, "Courier New", monospace; letter-spacing: 0.18em; color: rgba(150,255,170,0.85); text-shadow: 0 0 6px rgba(80,255,120,0.8); }
+.lsr-fx-goggles .lsr-fx-rec { left: auto; right: 28px; animation: lsr-blink 1.6s steps(2) infinite; }
+@keyframes lsr-blink { 50% { opacity: 0.2; } }
+@media (prefers-reduced-motion: reduce) { .lsr-fx-scan.on, .lsr-fx-goggles .lsr-fx-rec { animation: none; } }

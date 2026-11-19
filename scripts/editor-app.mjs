@@ -51,7 +51,8 @@ export class EditorApp extends HtmlApp {
       deleteZone: EditorApp.#onDeleteZone,
       addZone: EditorApp.#onAddZone,
       repaint: EditorApp.#onRepaint,
-      redrawZones: EditorApp.#onRedrawZones
+      redrawZones: EditorApp.#onRedrawZones,
+      shiftAll: EditorApp.#onShiftAll
     })
   };
 
@@ -119,6 +120,13 @@ export class EditorApp extends HtmlApp {
       <ul class="lsr-zones">${zones}</ul>
       <div class="lsr-row"><select data-brush="newKind">${Object.entries(ZONE_KINDS).map(([k, z]) => opt(k, `${z.short} — ${z.label}`, k === b.newKind)).join("")}</select>
         <button type="button" data-action="addZone"><i class="fa-solid fa-plus"></i> Nova zona</button></div>
+      <h3>Altura dos hexágonos</h3>
+      <label>Altura visual dos degraus <output>${(this.map.lift ?? 0.15).toFixed(2)}</output><input type="range" data-lift min="0.05" max="0.35" step="0.01" value="${this.map.lift ?? 0.15}"></label>
+      <div class="lsr-row">
+        <button type="button" data-action="shiftAll" data-delta="1" data-tooltip="Sobe 1 nível de elevação em todo o terreno (líquidos ficam)"><i class="fa-solid fa-arrow-up"></i> Todo o terreno +1</button>
+        <button type="button" data-action="shiftAll" data-delta="-1" data-tooltip="Desce 1 nível de elevação em todo o terreno (mínimo 0)"><i class="fa-solid fa-arrow-down"></i> Todo o terreno −1</button>
+      </div>
+      <p class="lsr-hint">Para hexágonos soltos use os pincéis ↑ e ↓. Depois de mexer, clique em "Repintar fundo".</p>
       <div class="lsr-row lsr-foot">
         <button type="button" data-action="redrawZones" data-tooltip="Recria os desenhos das zonas a partir dos hexágonos"><i class="fa-solid fa-vector-square"></i> Redesenhar zonas</button>
         <button type="button" class="${this.dirtyTerrain ? "lsr-primary" : ""}" data-action="repaint" data-tooltip="Gera e envia a imagem de fundo nova"><i class="fa-solid fa-image"></i> Repintar fundo${this.dirtyTerrain ? " *" : ""}</button>
@@ -139,6 +147,15 @@ export class EditorApp extends HtmlApp {
       z[el.dataset.field] = el.value;
       await this.#saveZones([id]);
     }, "zona")));
+    root.querySelector("[data-lift]")?.addEventListener("input", ev => {
+      const out = ev.target.closest("label")?.querySelector("output");
+      if ( out ) out.textContent = Number(ev.target.value).toFixed(2);
+    });
+    root.querySelector("[data-lift]")?.addEventListener("change", ev => {
+      this.map.lift = Number(ev.target.value) || 0.15;
+      this.dirtyTerrain = true;
+      this.render();
+    });
     this.#listen(this.brush.mode !== "off");
   }
 
@@ -296,6 +313,18 @@ export class EditorApp extends HtmlApp {
   static async #onRedrawZones() {
     await rebuildZoneDrawings(this.scene, this.map, this.geo);
     ui.notifications.info(`${MODULE_TITLE}: desenhos das zonas recriados.`);
+  }
+
+  static #onShiftAll(event, target) {
+    const d = Number(target.dataset.delta) || 0;
+    for ( let k = 0; k < this.map.h.length; k++ ) {
+      if ( "wWli".includes(this.map.t[k]) ) continue;
+      this.map.h[k] = Math.max(0, Math.min(9, this.map.h[k] + d));
+    }
+    this.map.maxH = Math.max(1, Math.min(9, (this.map.maxH ?? 4) + d));
+    this.dirtyTerrain = true;
+    ui.notifications.info(`Lancer Sitreps: terreno ${d > 0 ? "subiu" : "desceu"} 1 nível. Clique em "Repintar fundo" para ver.`);
+    this.render();
   }
 
   static async #onRepaint(event, target) {

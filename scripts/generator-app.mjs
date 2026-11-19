@@ -106,6 +106,7 @@ export class GeneratorApp extends HtmlApp {
             <label>Hexágonos<select name="columns">${opt("0", "Ponta para cima (linhas)", !o.columns)}${opt("1", "Lado para cima (colunas)", o.columns)}</select></label>
             <label>Altura máxima<input type="number" name="maxH" min="1" max="8" value="${o.maxH}"></label>
           </div>
+          <label data-tooltip="Quanto cada nível de elevação \"sobe\" no desenho (paredes e degraus). Não muda a elevação das regras.">Altura visual dos hexágonos <output>${(o.lift ?? 0.15).toFixed(2)}</output><input type="range" name="lift" min="0.05" max="0.35" step="0.01" value="${o.lift ?? 0.15}"></label>
           <label>Relevo <output>${o.relief.toFixed(2)}</output><input type="range" name="relief" min="0.2" max="1.6" step="0.05" value="${o.relief}"></label>
           <label>Cobertura <output>${o.cover.toFixed(2)}</output><input type="range" name="cover" min="0.2" max="2.5" step="0.05" value="${o.cover}"></label>
           <label>Líquido <output>${o.water == null ? "padrão do bioma" : `${Math.round(o.water * 100)}%`}</output><input type="range" name="water" min="-0.02" max="0.6" step="0.02" value="${o.water ?? -0.02}"></label>
@@ -155,7 +156,7 @@ export class GeneratorApp extends HtmlApp {
       sitrep: v.sitrep, biome: v.biome,
       cols: Math.max(10, Math.min(60, v.cols || 30)), rows: Math.max(8, Math.min(50, v.rows || 20)),
       columns: v.columns === "1", maxH: Math.max(1, Math.min(8, v.maxH || 4)),
-      relief: v.relief, cover: v.cover, water: v.water < 0 ? null : v.water, roads: v.roads, seed: v.seed || newSeed()
+      relief: v.relief, lift: v.lift || 0.15, cover: v.cover, water: v.water < 0 ? null : v.water, roads: v.roads, seed: v.seed || newSeed()
     });
     this.name = v.sceneName;
     this.briefing = v.briefing;
@@ -171,6 +172,7 @@ export class GeneratorApp extends HtmlApp {
     const geo = makeGeometry(grid, { cols: this.opts.cols, rows: this.opts.rows }, MARGIN, MARGIN);
     const map = generateMap(this.opts, geo);
     map.world = this.world ? { ...this.world } : null;
+    map.lift = this.opts.lift ?? 0.15;
     return { map, geo };
   }
 

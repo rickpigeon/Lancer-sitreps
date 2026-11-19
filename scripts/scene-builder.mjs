@@ -43,7 +43,8 @@ export function pickGridSize(map) {
   const wanted = Math.max(50, Math.min(200, Number(game.settings.get(MODULE_ID, "gridSize")) || 100));
   for ( let size = wanted; size >= 40; size -= 10 ) {
     const g = gridModel({ size, columns: map.columns, even: map.even });
-    const geo = makeGeometry(g, { cols: map.cols + (MARGIN * 2), rows: map.rows + (MARGIN * 2) + 1 }, 0, 0);
+    const extra = Math.max(1, Math.ceil(((Number(map.maxH) || 4) + 2) * (map.lift ?? 0.15) / 0.8));
+    const geo = makeGeometry(g, { cols: map.cols + (MARGIN * 2), rows: map.rows + (MARGIN * 2) + extra }, 0, 0);
     if ( geo.bounds.x1 <= MAX_SIDE && geo.bounds.y1 <= MAX_SIDE ) return { size, width: Math.ceil(geo.bounds.x1), height: Math.ceil(geo.bounds.y1) };
   }
   return { size: 40, width: MAX_SIDE, height: MAX_SIDE };
@@ -143,6 +144,10 @@ export async function createSitrepScene(map, opts = {}) {
 
 /** Re-paint the background of an existing sitrep scene after edits. */
 export async function repaintScene(scene, map = getMap(scene)) {
+  /* taller hex steps need more room under the map for the base */
+  const geo = sceneGeometry(scene, map);
+  const need = Math.ceil(geo.bounds.y1 + ((((Number(map.maxH) || 4) + 2) * (map.lift ?? 0.15)) + 0.6) * geo.size);
+  if ( need > scene.height && need <= 8192 ) await scene.update({ height: need });
   const src = await paintBackground(scene, map);
   await scene.update({ "background.src": src, [`flags.${MODULE_ID}.${FLAG_MAP}`]: map });
   return src;

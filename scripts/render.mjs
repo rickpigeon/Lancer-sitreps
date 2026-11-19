@@ -240,7 +240,7 @@ function roads(ctx, map, biome, geo, S) {
 export function renderTopDown(ctx, map, geo, view = {}, options = {}) {
   const biome = biomeOf(map);
   const S = geo.size;
-  const lift = S * (options.lift ?? 0.15);
+  const lift = S * (options.lift ?? map.lift ?? 0.15);
   const { ox = 0, oy = 0, scale = 1 } = view;
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
@@ -479,7 +479,7 @@ export function renderDiorama(ctx, map, geo, options = {}) {
   const biome = biomeOf(map);
   const S = geo.size;
   const K = 0.66;
-  const liftI = S * 0.4;
+  const liftI = S * 0.4 * ((map.lift ?? 0.15) / 0.15);
   const BASE = -2.4;
   const N = map.cols * map.rows;
   const W = ctx.canvas.width;

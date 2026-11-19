@@ -44,6 +44,9 @@ export const FX_PRESETS = {
     particles: [{ kind: "streak", n: 90, color: "#e2c48a", speed: 340, angle: 178, size: 30, alpha: 0.35 }] },
   20: { name: "Mundo Sagrado", tint: "rgba(255,240,220,0.05)", vignette: "rgba(255,220,180,0.2)",
     particles: [{ kind: "dot", n: 40, color: "#fff2c8", speed: 14, angle: -70, size: 3, wobble: 30, alpha: 0.7 }, { kind: "flake", n: 14, color: "#ffc0d8", speed: 30, angle: 70, size: 4, wobble: 40, alpha: 0.7 }] },
+  nv: { name: "Visão noturna", tint: "rgba(40,255,90,0.10)", goggles: true, scan: true, grain: 0.5,
+    boardFilter: "grayscale(1) sepia(1) hue-rotate(58deg) saturate(1.9) brightness(0.88) contrast(1.3)",
+    particles: [{ kind: "dot", n: 18, color: "#b8ffc8", speed: 8, angle: -80, size: 2, wobble: 12, alpha: 0.5 }] },
   rain: { name: "Chuva", tint: "rgba(40,60,90,0.10)", vignette: "rgba(10,20,40,0.4)",
     particles: [{ kind: "streak", n: 180, color: "#cfe0ff", speed: 1000, angle: 100, size: 22, alpha: 0.45 }] },
   fog: { name: "Neblina", tint: "rgba(220,225,230,0.10)", vignette: "rgba(200,205,210,0.4)",
@@ -54,4 +57,4 @@ export const FX_PRESETS = {
     particles: [{ kind: "spark", n: 25, color: "#ffffff", speed: 0, angle: 0, size: 6, alpha: 0.8 }] }
 };
 
-export const FX_ORDER = [...Array.from({ length: 20 }, (_, i) => String(i + 1)), "rain", "fog", "ash", "space"];
+export const FX_ORDER = [...Array.from({ length: 20 }, (_, i) => String(i + 1)), "nv", "rain", "fog", "ash", "space"];

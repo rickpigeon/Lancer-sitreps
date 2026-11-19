@@ -11,7 +11,7 @@ export const MAP_VERSION = 1;
 
 export const DEFAULTS = {
   sitrep: "control", biome: "grassland", cols: 30, rows: 20, maxH: 4, relief: 1, cover: 1, water: null,
-  roads: true, columns: false, even: false, seed: "ALFA-100"
+  roads: true, columns: false, even: false, seed: "ALFA-100", lift: 0.15
 };
 
 const PROP_SIZE = {
